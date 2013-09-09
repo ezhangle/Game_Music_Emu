@@ -431,13 +431,3 @@ const char* gme_err_str( gme_err_t err )
 {
 	return blargg_err_str( err );
 }
-
-#include "lanczos_resampler.h"
-
-static struct gme_lanczos_initializer
-{
-	gme_lanczos_initializer()
-	{
-		gme_lanczos_init();
-	}
-} g_lanczos_initializer;

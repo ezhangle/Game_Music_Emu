@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-void gme_lanczos_init();
-
 void * gme_lanczos_resampler_create(int buffer_size);
 void gme_lanczos_resampler_delete(void *);
 

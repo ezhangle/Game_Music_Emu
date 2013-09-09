@@ -23,12 +23,18 @@ static double sinc(double x)
 	return fEqual(x, 0.0) ? 1.0 : sin(x * M_PI) / (x * M_PI);
 }
 
-void gme_lanczos_init()
+static void gme_lanczos_init()
 {
-	unsigned i;
-	double dx = (double)(LANCZOS_WIDTH) / LANCZOS_SAMPLES, x = 0.0;
-	for (i = 0; i < LANCZOS_SAMPLES + 1; ++i, x += dx)
-		lanczos_lut[i] = abs(x) < LANCZOS_WIDTH ? sinc(x) * sinc(x / LANCZOS_WIDTH) : 0.0;
+	static int initialized = 0;
+
+	if ( !initialized )
+	{
+		unsigned i;
+		double dx = (double)(LANCZOS_WIDTH) / LANCZOS_SAMPLES, x = 0.0;
+		for (i = 0; i < LANCZOS_SAMPLES + 1; ++i, x += dx)
+			lanczos_lut[i] = abs(x) < LANCZOS_WIDTH ? sinc(x) * sinc(x / LANCZOS_WIDTH) : 0.0;
+		initialized = 1;
+	}
 }
 
 typedef struct lanczos_resampler
@@ -47,6 +53,8 @@ void * gme_lanczos_resampler_create(int buffer_size)
 {
 	lanczos_resampler * r = ( lanczos_resampler * ) malloc( sizeof(lanczos_resampler) );
     if ( !r ) return 0;
+
+	gme_lanczos_init();
 
 	r->write_pos = 0;
     r->write_filled = 0;
