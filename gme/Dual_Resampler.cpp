@@ -43,7 +43,7 @@ void Dual_Resampler::resize( int pairs )
 			return;
 		}
 		sample_buf_size = new_sample_buf_size;
-		oversamples_per_frame = int (pairs * gme_lanczos_resampler_get_rate(resampler) * 2) + 2;
+		oversamples_per_frame = int (pairs * gme_lanczos_resampler_get_rate(resampler)) * 2 + 2;
 		clear();
 	}
 }
