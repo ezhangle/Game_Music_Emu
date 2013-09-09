@@ -113,7 +113,6 @@ SOURCES += \
     ../../gme/fmopl.cpp \
     ../../gme/fm2612.c \
     ../../gme/fm.c \
-    ../../gme/Fir_Resampler.cpp \
     ../../gme/Effects_Buffer.cpp \
     ../../gme/Dual_Resampler.cpp \
     ../../gme/Downsampler.cpp \
@@ -132,7 +131,8 @@ SOURCES += \
     ../../gme/qmix.c \
     ../../gme/Qsound_Apu.cpp \
     ../../gme/Bml_Parser.cpp \
-    ../../gme/Spc_Sfm.cpp
+    ../../gme/Spc_Sfm.cpp \
+    ../../gme/lanczos_resampler.c
 
 HEADERS += \
     ../../gme/Z80_Cpu.h \
@@ -236,7 +236,6 @@ HEADERS += \
     ../../gme/Gb_Apu.h \
     ../../gme/fmopl.h \
     ../../gme/fm.h \
-    ../../gme/Fir_Resampler.h \
     ../../gme/Effects_Buffer.h \
     ../../gme/Dual_Resampler.h \
     ../../gme/Downsampler.h \
@@ -262,7 +261,8 @@ HEADERS += \
     ../../gme/qmix.h \
     ../../gme/Qsound_Apu.h \
     ../../gme/Bml_Parser.h \
-    ../../gme/Spc_Sfm.h
+    ../../gme/Spc_Sfm.h \
+    ../../gme/lanczos_resampler.h
 
 unix:!symbian {
     maemo5 {

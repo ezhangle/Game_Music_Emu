@@ -19,13 +19,16 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 // TODO: support Spc_Filter's bass
 
+#include "lanczos_resampler.h"
+
 Spc_Emu::Spc_Emu()
 {
 	set_type( gme_spc_type );
 	set_gain( 1.4 );
+	resampler = gme_lanczos_resampler_create( 64 );
 }
 
-Spc_Emu::~Spc_Emu() { }
+Spc_Emu::~Spc_Emu() { gme_lanczos_resampler_delete(resampler); }
 
 // Track info
 
@@ -322,8 +325,9 @@ blargg_err_t Spc_Emu::set_sample_rate_( int sample_rate )
 	RETURN_ERR( apu.init() );
 	if ( sample_rate != native_sample_rate )
 	{
-		RETURN_ERR( resampler.resize_buffer( native_sample_rate / 20 * 2 ) );
-		RETURN_ERR( resampler.set_rate( (double) native_sample_rate / sample_rate ) ); // 0.9965 rolloff
+		if ( gme_lanczos_resampler_resize( resampler, native_sample_rate / 20 ) < 0 )
+			return blargg_err_memory;
+		gme_lanczos_resampler_set_rate( resampler, (double) native_sample_rate / sample_rate ); // 0.9965 rolloff
 	}
 	return blargg_ok;
 }
@@ -359,7 +363,7 @@ void Spc_Emu::set_tempo_( double t )
 blargg_err_t Spc_Emu::start_track_( int track )
 {
 	RETURN_ERR( Music_Emu::start_track_( track ) );
-	resampler.clear();
+	if ( resampler ) gme_lanczos_resampler_clear( resampler );
 	filter.clear();
 	RETURN_ERR( apu.load_spc( file_begin(), file_size() ) );
 	filter.set_gain( (int) (gain() * Spc_Filter::gain_unit) );
@@ -378,8 +382,8 @@ blargg_err_t Spc_Emu::skip_( int count )
 {
 	if ( sample_rate() != native_sample_rate )
 	{
-		count = (int) (count * resampler.rate()) & ~1;
-		count -= resampler.skip_input( count );
+		count = (int) (count * gme_lanczos_resampler_get_rate( resampler ) ) & ~1;
+		count -= gme_lanczos_resampler_skip_input( resampler, count );
 	}
 	
 	// TODO: shouldn't skip be adjusted for the 64 samples read afterwards?
@@ -400,16 +404,30 @@ blargg_err_t Spc_Emu::play_( int count, sample_t out [] )
 {
 	if ( sample_rate() == native_sample_rate )
 		return play_and_filter( count, out );
+
+	sample_t buffer[64];
 	
 	int remain = count;
 	while ( remain > 0 )
 	{
-		remain -= resampler.read( &out [count - remain], remain );
+		while ( remain > 0 && gme_lanczos_resampler_get_sample_count(resampler) )
+		{
+			gme_lanczos_resampler_get_sample(resampler, &out[count - remain], &out[count - remain + 1]);
+			gme_lanczos_resampler_remove_sample(resampler);
+			remain -= 2;
+		}
 		if ( remain > 0 )
 		{
-			int n = resampler.buffer_free();
-			RETURN_ERR( play_and_filter( n, resampler.buffer() ) );
-			resampler.write( n );
+			int n = gme_lanczos_resampler_get_write_sample_free(resampler);
+			while (n > 0)
+			{
+				if (n > 32) n = 32;
+				n <<= 1;
+				RETURN_ERR( play_and_filter( n, buffer ) );
+				for ( int i = 0; i < n; i += 2 )
+					gme_lanczos_resampler_write_sample(resampler, buffer[i], buffer[i + 1] );
+				n = gme_lanczos_resampler_get_write_sample_free(resampler);
+			}
 		}
 	}
 	check( remain == 0 );

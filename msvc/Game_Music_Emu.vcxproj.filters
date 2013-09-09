@@ -59,9 +59,6 @@
     <ClCompile Include="..\gme\Effects_Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\gme\Fir_Resampler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\gme\Gbs_Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gme\Kss_Scc_Apu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gme\lanczos_resampler.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gme\M3u_Playlist.cpp">
@@ -415,9 +415,6 @@
     <ClInclude Include="..\gme\Effects_Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\gme\Fir_Resampler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\gme\Gbs_Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -473,6 +470,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gme\Kss_Scc_Apu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gme\lanczos_resampler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gme\M3u_Playlist.h">

@@ -6,56 +6,48 @@
 
 #include "Multi_Buffer.h"
 
-#if GME_VGM_FAST_RESAMPLER
-	#include "Downsampler.h"
-	typedef Downsampler Dual_Resampler_Downsampler;
-#else
-	#include "Fir_Resampler.h"
-	typedef Fir_Resampler_Norm Dual_Resampler_Downsampler;
-#endif
+#include "lanczos_resampler.h"
 
 class Dual_Resampler {
 public:
 	typedef short dsample_t;
+
+	Dual_Resampler() { resampler = gme_lanczos_resampler_create(64); }
+	~Dual_Resampler() { gme_lanczos_resampler_delete(resampler); }
 	
-	blargg_err_t setup( double oversample, double rolloff, double gain );
-	double rate() const { return resampler.rate(); }
+	void setup( double oversample, double gain );
 	blargg_err_t reset( int max_pairs );
 	void resize( int pairs_per_frame );
+	double rate() const { return gme_lanczos_resampler_get_rate(resampler); }
 	void clear();
 	
     void dual_play( int count, dsample_t out [], Stereo_Buffer&, Stereo_Buffer** secondary_buf_set = NULL, int secondary_buf_set_count = 0 );
 	
 	blargg_callback<int (*)( void*, blip_time_t, int, dsample_t* )> set_callback;
 
-// Implementation
-public:
-	Dual_Resampler();
-	~Dual_Resampler();
-
 private:
 	enum { gain_bits = 14 };
+	blargg_vector<dsample_t> resample_buf;
 	blargg_vector<dsample_t> sample_buf;
 	int sample_buf_size;
 	int oversamples_per_frame;
 	int buf_pos;
 	int buffered;
-	int resampler_size;
 	int gain_;
 	
-	Dual_Resampler_Downsampler resampler;
+	void * resampler;
     void mix_samples( Stereo_Buffer&, dsample_t [], int, Stereo_Buffer**, int );
 	void mix_mono( Stereo_Buffer&, dsample_t [], int );
 	void mix_stereo( Stereo_Buffer&, dsample_t [], int );
 	void mix_extra_mono( Stereo_Buffer&, dsample_t [], int );
     void mix_extra_stereo( Stereo_Buffer&, dsample_t [], int );
-    int play_frame_( Stereo_Buffer&, dsample_t [], Stereo_Buffer**, int );
+	int play_frame_( Stereo_Buffer&, dsample_t [], Stereo_Buffer**, int );
 };
 
-inline blargg_err_t Dual_Resampler::setup( double oversample, double rolloff, double gain )
+inline void Dual_Resampler::setup( double oversample, double gain )
 {
 	gain_ = (int) ((1 << gain_bits) * gain);
-	return resampler.set_rate( oversample );
+	gme_lanczos_resampler_set_rate(resampler, oversample);
 }
 
 #endif

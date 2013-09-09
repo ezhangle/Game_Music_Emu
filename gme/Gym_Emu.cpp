@@ -183,7 +183,7 @@ blargg_err_t Gym_Emu::set_sample_rate_( int sample_rate )
 	double factor = oversample;
 	if ( disable_oversampling_ )
 		factor = (double) base_clock / 7 / 144 / sample_rate;
-	RETURN_ERR( resampler.setup( factor, 0.990, fm_gain * gain() ) );
+	resampler.setup( factor, fm_gain * gain() );
 	factor = resampler.rate();
 	double fm_rate = sample_rate * factor;
 	

@@ -19,7 +19,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 // FM emulators are internally quieter to avoid 16-bit overflow
 double const fm_gain           = 3.0;
-double const rolloff           = 0.990;
 double const oversample_factor = 1.5;
 
 Vgm_Emu::Vgm_Emu()
@@ -433,7 +432,7 @@ blargg_err_t Vgm_Emu::load_mem_( byte const data [], int size )
 	if ( core.uses_fm() )
 	{
 		set_voice_count( 8 );
-		RETURN_ERR( resampler.setup( fm_rate / sample_rate(), rolloff, gain() ) );
+		resampler.setup( fm_rate / sample_rate(), gain() );
 		RETURN_ERR( resampler.reset( core.stereo_buf[0].length() * sample_rate() / 1000 ) );
 		core.psg[0].volume( 0.135 * fm_gain * psg_gain * gain() );
 		core.psg[1].volume( 0.135 * fm_gain * psg_gain * gain() );

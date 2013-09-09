@@ -20,18 +20,14 @@ int const resampler_extra = 34;
 
 int const stereo = 2;
 
-Dual_Resampler::Dual_Resampler() { }
-
-Dual_Resampler::~Dual_Resampler() { }
-
 blargg_err_t Dual_Resampler::reset( int pairs )
 {
 	// expand allocations a bit
 	RETURN_ERR( sample_buf.resize( (pairs + (pairs >> 2)) * 2 ) );
 	resize( pairs );
-	resampler_size = oversamples_per_frame + (oversamples_per_frame >> 2);
-	RETURN_ERR( resampler.resize_buffer( resampler_size ) );
-	resampler.clear();
+	unsigned int resampler_size = oversamples_per_frame + (oversamples_per_frame >> 2);
+	if ( gme_lanczos_resampler_resize( resampler, resampler_size ) < 0 ) return blargg_err_memory;
+	RETURN_ERR( resample_buf.resize( resampler_size * 2 ) );
 	return blargg_ok;
 }
 
@@ -47,7 +43,7 @@ void Dual_Resampler::resize( int pairs )
 			return;
 		}
 		sample_buf_size = new_sample_buf_size;
-		oversamples_per_frame = int (pairs * resampler.rate()) * 2 + 2;
+		oversamples_per_frame = int (pairs * gme_lanczos_resampler_get_rate(resampler) * 2) + 2;
 		clear();
 	}
 }
@@ -55,52 +51,67 @@ void Dual_Resampler::resize( int pairs )
 void Dual_Resampler::clear()
 {
 	buf_pos = buffered = 0;
-	resampler.clear();
+	gme_lanczos_resampler_clear(resampler);
 }
-
 
 int Dual_Resampler::play_frame_( Stereo_Buffer& stereo_buf, dsample_t out [], Stereo_Buffer** secondary_buf_set, int secondary_buf_set_count )
 {
 	int pair_count = sample_buf_size >> 1;
 	blip_time_t blip_time = stereo_buf.center()->count_clocks( pair_count );
-    int sample_count = oversamples_per_frame - resampler.written() + resampler_extra;
-	
-	int new_count = set_callback.f( set_callback.data, blip_time, sample_count, resampler.buffer() );
-	assert( new_count < resampler_size );
-	
-	stereo_buf.end_frame( blip_time );
-    assert( stereo_buf.samples_avail() == pair_count * 2 );
-    if ( secondary_buf_set && secondary_buf_set_count )
-    {
-        for ( int i = 0; i < secondary_buf_set_count; i++ )
-        {
-            Stereo_Buffer * second_buf = secondary_buf_set[i];
-            blip_time_t blip_time_2 = second_buf->center()->count_clocks( pair_count );
-            second_buf->end_frame( blip_time_2 );
-            assert( second_buf->samples_avail() == pair_count * 2 );
-        }
-    }
+	int sample_count = gme_lanczos_resampler_get_write_sample_free( resampler ) * 2;
 
-	resampler.write( new_count );
-	
-	int count = resampler.read( sample_buf.begin(), sample_buf_size );
-	
-    mix_samples( stereo_buf, out, count, secondary_buf_set, secondary_buf_set_count );
+	if ( sample_count > 0 )
+	{
+		if ( sample_count > oversamples_per_frame )
+			sample_count = oversamples_per_frame;
+
+		int new_count = set_callback.f( set_callback.data, blip_time, sample_count, &resample_buf[0] );
+
+		for ( int i = 0; i < new_count; i += 2 )
+		{
+			gme_lanczos_resampler_write_sample(resampler, resample_buf[i], resample_buf[i + 1]);
+		}
+	}
+
+	stereo_buf.end_frame( blip_time );
+	assert( stereo_buf.samples_avail() == pair_count * 2 );
+	if ( secondary_buf_set && secondary_buf_set_count )
+	{
+		for ( int i = 0; i < secondary_buf_set_count; i++ )
+		{
+			Stereo_Buffer * second_buf = secondary_buf_set[i];
+			blip_time_t blip_time_2 = second_buf->center()->count_clocks( pair_count );
+			second_buf->end_frame( blip_time_2 );
+			assert( second_buf->samples_avail() == pair_count * 2 );
+		}
+	}
+
+	int count = gme_lanczos_resampler_get_sample_count(resampler) * 2;
+
+	if ( count > sample_buf_size ) count = sample_buf_size;
+
+	for ( int i = 0; i < count; i += 2 )
+	{
+		gme_lanczos_resampler_get_sample( resampler, &sample_buf[i], &sample_buf[i + 1] );
+		gme_lanczos_resampler_remove_sample( resampler );
+	}
+
+	mix_samples( stereo_buf, out, count, secondary_buf_set, secondary_buf_set_count );
 
 	pair_count = count >> 1;
 	stereo_buf.left()->remove_samples( pair_count );
 	stereo_buf.right()->remove_samples( pair_count );
 	stereo_buf.center()->remove_samples( pair_count );
 
-    if ( secondary_buf_set && secondary_buf_set_count )
-    {
-        for ( int i = 0; i < secondary_buf_set_count; i++ )
-        {
-            Stereo_Buffer * second_buf = secondary_buf_set[i];
-            second_buf->left()->remove_samples( pair_count );
-            second_buf->right()->remove_samples( pair_count );
-            second_buf->center()->remove_samples( pair_count );
-        }
+	if ( secondary_buf_set && secondary_buf_set_count )
+	{
+		for ( int i = 0; i < secondary_buf_set_count; i++ )
+		{
+			Stereo_Buffer * second_buf = secondary_buf_set[i];
+			second_buf->left()->remove_samples( pair_count );
+			second_buf->right()->remove_samples( pair_count );
+			second_buf->center()->remove_samples( pair_count );
+		}
 	}
 
 	return count;

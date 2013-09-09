@@ -10,14 +10,6 @@
 
 #include "Bml_Parser.h"
 
-#if GME_SPC_FAST_RESAMPLER
-    #include "Upsampler.h"
-    typedef Upsampler Spc_Emu_Resampler;
-#else
-    #include "Fir_Resampler.h"
-    typedef Fir_Resampler<24> Spc_Emu_Resampler;
-#endif
-
 class Sfm_Emu : public Music_Emu {
 public:
     // Minimum allowed file size
@@ -55,7 +47,7 @@ protected:
     virtual void set_tempo_( double );
 
 private:
-    Spc_Emu_Resampler resampler;
+	void * resampler;
     Spc_Filter filter;
     Snes_Spc apu;
 

@@ -101,7 +101,6 @@
     <ClCompile Include="..\gme\Downsampler.cpp" />
     <ClCompile Include="..\gme\Dual_Resampler.cpp" />
     <ClCompile Include="..\gme\Effects_Buffer.cpp" />
-    <ClCompile Include="..\gme\Fir_Resampler.cpp" />
     <ClCompile Include="..\gme\fm.c" />
     <ClCompile Include="..\gme\fm2612.c" />
     <ClCompile Include="..\gme\fmopl.cpp" />
@@ -130,6 +129,7 @@
     <ClCompile Include="..\gme\Kss_Cpu.cpp" />
     <ClCompile Include="..\gme\Kss_Emu.cpp" />
     <ClCompile Include="..\gme\Kss_Scc_Apu.cpp" />
+    <ClCompile Include="..\gme\lanczos_resampler.c" />
     <ClCompile Include="..\gme\M3u_Playlist.cpp" />
     <ClCompile Include="..\gme\Multi_Buffer.cpp" />
     <ClCompile Include="..\gme\Music_Emu.cpp" />
@@ -229,7 +229,6 @@
     <ClInclude Include="..\gme\Downsampler.h" />
     <ClInclude Include="..\gme\Dual_Resampler.h" />
     <ClInclude Include="..\gme\Effects_Buffer.h" />
-    <ClInclude Include="..\gme\Fir_Resampler.h" />
     <ClInclude Include="..\gme\fm.h" />
     <ClInclude Include="..\gme\fmopl.h" />
     <ClInclude Include="..\gme\Gb_Apu.h" />
@@ -257,6 +256,7 @@
     <ClInclude Include="..\gme\Kss_Core.h" />
     <ClInclude Include="..\gme\Kss_Emu.h" />
     <ClInclude Include="..\gme\Kss_Scc_Apu.h" />
+    <ClInclude Include="..\gme\lanczos_resampler.h" />
     <ClInclude Include="..\gme\M3u_Playlist.h" />
     <ClInclude Include="..\gme\mamedef.h" />
     <ClInclude Include="..\gme\Multi_Buffer.h" />
