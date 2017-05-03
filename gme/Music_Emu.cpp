@@ -19,6 +19,8 @@ int const stereo = 2; // number of channels for stereo
 
 Music_Emu::equalizer_t const Music_Emu::tv_eq = { -8.0, 180, 0,0,0,0,0,0,0,0 };
 
+gme_t * new_gme_t() { return new gme_t; }
+
 void Music_Emu::clear_track_vars()
 {
 	current_track_ = -1;

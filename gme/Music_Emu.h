@@ -12,10 +12,10 @@ class Multi_Buffer;
 struct gme_t : public Gme_File, private Track_Filter::callbacks_t {
 public:
 	// Sets output sample rate. Must be called only once before loading file.
-	blargg_err_t set_sample_rate( int sample_rate );
+	virtual blargg_err_t set_sample_rate( int sample_rate );
 
 	// Sample rate sound is generated at
-	int sample_rate() const;
+	virtual int sample_rate() const;
 	
 // File loading
 
@@ -24,25 +24,25 @@ public:
 // Basic playback
 
 	// Starts a track, where 0 is the first track. Also clears warning string.
-	blargg_err_t start_track( int );
+	virtual blargg_err_t start_track( int );
 	
 	// Generates 'count' samples info 'buf'. Output is in stereo. Any emulation
 	// errors set warning string, and major errors also end track.
 	typedef short sample_t;
-	blargg_err_t play( int count, sample_t* buf );
+	virtual blargg_err_t play( int count, sample_t* buf );
 	
 // Track information
 	
 	// See Gme_File.h
 	
 	// Index of current track or -1 if one hasn't been started
-	int current_track() const;
+	virtual int current_track() const;
 
 	// Info for currently playing track
 	using Gme_File::track_info;
-	blargg_err_t track_info( track_info_t* out ) const;
-    blargg_err_t set_track_info( const track_info_t* in );
-    blargg_err_t set_track_info( const track_info_t* in, int track_number );
+	virtual blargg_err_t track_info( track_info_t* out ) const;
+    virtual blargg_err_t set_track_info( const track_info_t* in );
+    virtual blargg_err_t set_track_info( const track_info_t* in, int track_number );
 
 	struct Hash_Function
 	{
@@ -50,54 +50,54 @@ public:
 	};
 	virtual blargg_err_t hash_( Hash_Function& ) const BLARGG_PURE( ; )
     
-    blargg_err_t save( gme_writer_t writer, void* your_data) const;
+    virtual blargg_err_t save( gme_writer_t writer, void* your_data) const;
 
 // Track status/control
 
 	// Number of milliseconds played since beginning of track (1000 per second)
-	int tell() const;
+	virtual int tell() const;
 	
 	// Seeks to new time in track. Seeking backwards or far forward can take a while.
-	blargg_err_t seek( int msec );
+	virtual blargg_err_t seek( int msec );
 	
 	// Skips n samples
-	blargg_err_t skip( int n );
+	virtual blargg_err_t skip( int n );
 	
 	// True if a track has reached its end
-	bool track_ended() const;
+	virtual bool track_ended() const;
 	
 	// Sets start time and length of track fade out. Once fade ends track_ended() returns
 	// true. Fade time must be set after track has been started, and can be changed
 	// at any time.
-	void set_fade( int start_msec, int length_msec = 8000 );
+	virtual void set_fade( int start_msec, int length_msec = 8000 );
 	
 	// Disables automatic end-of-track detection and skipping of silence at beginning
-	void ignore_silence( bool disable = true );
+	virtual void ignore_silence( bool disable = true );
 	
 // Voices
 
 	// Number of voices used by currently loaded file
-	int voice_count() const;
+	virtual int voice_count() const;
 	
 	// Name of voice i, from 0 to voice_count()-1
-	const char* voice_name( int i ) const;
+	virtual const char* voice_name( int i ) const;
 	
 	// Mutes/unmutes voice i, where voice 0 is first voice
-	void mute_voice( int index, bool mute = true );
+	virtual void mute_voice( int index, bool mute = true );
 	
 	// Sets muting state of all voices at once using a bit mask, where -1 mutes them all,
 	// 0 unmutes them all, 0x01 mutes just the first voice, etc.
-	void mute_voices( int mask );
+	virtual void mute_voices( int mask );
 
 // Sound customization
 	
 	// Adjusts song tempo, where 1.0 = normal, 0.5 = half speed, 2.0 = double speed.
 	// Track length as returned by track_info() assumes a tempo of 1.0.
-	void set_tempo( double );
+	virtual void set_tempo( double );
 	
 	// Changes overall output amplitude, where 1.0 results in minimal clamping.
 	// Must be called before set_sample_rate().
-	void set_gain( double );
+	virtual void set_gain( double );
 	
 	// Requests use of custom multichannel buffer. Only supported by "classic" emulators;
 	// on others this has no effect. Should be called only once *before* set_sample_rate().
@@ -113,10 +113,10 @@ public:
 	typedef gme_equalizer_t equalizer_t;
 	
 	// Current frequency equalizater parameters
-	equalizer_t const& equalizer() const;
+	virtual equalizer_t const& equalizer() const;
 	
 	// Sets frequency equalizer parameters
-	void set_equalizer( equalizer_t const& );
+	virtual void set_equalizer( equalizer_t const& );
 	
 	// Equalizer preset for a TV speaker
 	static equalizer_t const tv_eq;
@@ -124,28 +124,28 @@ public:
 // Derived interface
 protected:
 	// Cause any further generated samples to be silence, instead of calling play_()
-	void set_track_ended()                      { track_filter.set_track_ended(); }
+	virtual void set_track_ended()                      { track_filter.set_track_ended(); }
 	
 	// If more than secs of silence are encountered, track is ended
-	void set_max_initial_silence( int secs )    { tfilter.max_initial = secs; }
+	virtual void set_max_initial_silence( int secs )    { tfilter.max_initial = secs; }
 	
 	// Sets rate emulator is run at when scanning ahead for silence. 1=100%, 2=200% etc.
-	void set_silence_lookahead( int rate )      { tfilter.lookahead = rate; }
+	virtual void set_silence_lookahead( int rate )      { tfilter.lookahead = rate; }
 	
 	// Sets number of voices
-	void set_voice_count( int n )               { voice_count_ = n; }
+	virtual void set_voice_count( int n )               { voice_count_ = n; }
 	
 	// Sets names of voices
-	void set_voice_names( const char* const names [] );
+	virtual void set_voice_names( const char* const names [] );
 	
 	// Current gain
-	double gain() const                         { return gain_; }
+	virtual double gain() const                         { return gain_; }
 	
 	// Current tempo
-	double tempo() const                        { return tempo_; }
+	virtual double tempo() const                        { return tempo_; }
 	
 	// Re-applies muting mask using mute_voices_()
-	void remute_voices();
+	virtual void remute_voices();
 	
 // Overrides should do the indicated task
 	
@@ -180,8 +180,8 @@ protected:
 // Implementation
 public:
 	gme_t();
-	~gme_t();
-	const char** voice_names() const { return CONST_CAST(const char**,voice_names_); }
+	virtual ~gme_t();
+	virtual const char** voice_names() const { return CONST_CAST(const char**,voice_names_); }
 
 protected:
 	virtual void unload();
@@ -229,6 +229,8 @@ struct Gme_Info_ : Music_Emu
 	virtual void pre_load();
 	virtual blargg_err_t post_load();
 };
+
+extern "C" __declspec(dllexport) gme_t * new_gme_t();
 
 inline blargg_err_t Music_Emu::track_info( track_info_t* out ) const
 {
