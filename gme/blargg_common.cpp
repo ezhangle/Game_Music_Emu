@@ -55,6 +55,7 @@ blargg_err_t blargg_vector_::resize_( size_t n, size_t elem_size )
 	return blargg_ok;
 }
 
+#if 0
 static const BOOST::uint8_t mask_tab[6]={0x80,0xE0,0xF0,0xF8,0xFC,0xFE};
 
 static const BOOST::uint8_t val_tab[6]={0,0xC0,0xE0,0xF0,0xF8,0xFC};
@@ -320,5 +321,6 @@ blargg_wchar_t* blargg_to_wide( const char* path )
 	assert( actual == needed );
 	return wpath;
 }
+#endif
 
 BLARGG_NAMESPACE_END
