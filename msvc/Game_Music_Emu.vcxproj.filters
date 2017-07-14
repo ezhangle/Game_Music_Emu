@@ -470,6 +470,9 @@
     <ClCompile Include="..\vgmplay\VGMPlay\chips\yam.c">
       <Filter>Source Files\vgmplay\chips</Filter>
     </ClCompile>
+    <ClCompile Include="..\gme\Nes_Cpu_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gme\Ay_Apu.h">
@@ -933,6 +936,9 @@
     </ClInclude>
     <ClInclude Include="..\vgmplay\VGMPlay\chips\yam.h">
       <Filter>Header Files\vgmplay\chips</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gme\Nes_Cpu_Impl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

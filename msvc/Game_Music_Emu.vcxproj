@@ -37,7 +37,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release2015|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -106,8 +106,7 @@
       <AdditionalIncludeDirectories>../..;../../File_Extractor/fex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x501;WIN32;NO_ZLIB;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -115,6 +114,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -159,6 +159,7 @@
     <ClCompile Include="..\gme\Music_Emu.cpp" />
     <ClCompile Include="..\gme\Nes_Apu.cpp" />
     <ClCompile Include="..\gme\Nes_Cpu.cpp" />
+    <ClCompile Include="..\gme\Nes_Cpu_Impl.cpp" />
     <ClCompile Include="..\gme\Nes_Fds_Apu.cpp" />
     <ClCompile Include="..\gme\Nes_Fme7_Apu.cpp" />
     <ClCompile Include="..\gme\Nes_Namco_Apu.cpp" />
@@ -329,6 +330,7 @@
     <ClInclude Include="..\gme\Music_Emu.h" />
     <ClInclude Include="..\gme\Nes_Apu.h" />
     <ClInclude Include="..\gme\Nes_Cpu.h" />
+    <ClInclude Include="..\gme\Nes_Cpu_Impl.h" />
     <ClInclude Include="..\gme\Nes_Cpu_run.h" />
     <ClInclude Include="..\gme\Nes_Fds_Apu.h" />
     <ClInclude Include="..\gme\Nes_Fme7_Apu.h" />
