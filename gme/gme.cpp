@@ -27,19 +27,8 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 // Default list of all supported game music types (copy this to blargg_config.h
 // if you want to modify it)
 #define GME_TYPE_LIST \
-	gme_ay_type,\
-	gme_gbs_type,\
-	gme_gym_type,\
-	gme_hes_type,\
-	gme_kss_type,\
 	gme_nsf_type,\
-	gme_nsfe_type,\
-	gme_sap_type,\
-    gme_sfm_type,\
-	gme_sgc_type,\
-	gme_spc_type,\
-	gme_vgm_type,\
-	gme_vgz_type
+	gme_nsfe_type
 
 #endif
 
