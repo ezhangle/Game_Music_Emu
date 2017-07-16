@@ -34,7 +34,8 @@ struct Nes_Cpu_Impl
 	bool nmi_edge_detected;
 	bool intr;
 
-	u8 PC, A, X, Y, S;
+    u16 PC;
+    u8 A, X, Y, S;
 
 	union /* Status flags: */
 	{

@@ -137,12 +137,12 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 	mcpu.P.raw = CPU.r.flags;
 	
-	auto & tick = [&]() -> void
+	auto tick = [&]() -> void
 	{
 		s_time++;
 	};
 
-	auto & RB = [&](u16 addr) -> u8
+	auto RB = [&](u16 addr) -> u8
 	{
 		// Memory writes are turned into reads while reset is being signalled
 		u8 r;
@@ -156,7 +156,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 		return r;
 	};
 
-	auto & WB = [&](u16 addr, u8 v) -> void
+	auto WB = [&](u16 addr, u8 v) -> void
 	{
 		// Memory writes are turned into reads while reset is being signalled
 		if (mcpu.reset) { RB(addr); return; }
@@ -176,7 +176,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 loop:
 	
 	// Read instruction
-
+    
+    u8 r = READ_CODE(mcpu.PC);
+    if (r == CPU.halt_opcode) goto stop;
+    
 	mcpu.Op();
 
 	// Update time
@@ -190,8 +193,6 @@ loop:
 	goto loop;
 	
 out_of_time:
-	mcpu.PC--;
-	
 	// Optional action that triggers interrupt or changes irq/end time
 	#ifdef CPU_DONE
 	{
