@@ -44,6 +44,7 @@ void Ins(Nes_Cpu_Impl & cpu)       // With template magic, the compiler will lit
 	t("    nink    nnnk                 ", sb = cpu.P.C)       // rol,rla, ror,rra,arr
 	t("nnnknnnk     0                   ", cpu.P.C = t & 0x80) // rol,rla, asl,slo,[arr,anc]
 	t("        nnnknink                 ", cpu.P.C = t & 0x01) // lsr,sre, ror,rra,asr
+    t("kinkkinkkinkkink !      kninkhnk ", cpu.WB(addr + d, t)) // read-modify-write instructions (dummy write)
 	t("ninknink                         ", t = (t << 1) | (sb * 0x01))
 	t("        nnnknnnk                 ", t = (t >> 1) | (sb * 0x80))
 	t("                 !      kink     ", t = u8(t - 1))  // dec,dex,dey,dcp
