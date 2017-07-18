@@ -98,6 +98,11 @@ gme_type_t gme_identify_extension( const char extension_ [] )
 	return *types;
 }
 
+const char* gme_type_extension( gme_type_t type )
+{
+	return type->extension_;
+}
+
 gme_err_t gme_identify_file( const char path [], gme_type_t* type_out )
 {
 	*type_out = gme_identify_extension( path );
