@@ -202,6 +202,9 @@ gme_type_t const* gme_type_list();
 /* Name of game system for this music file type */
 const char* gme_type_system( gme_type_t );
 
+/* File type extension for this music file type */
+const char* gme_type_extension( gme_type_t );
+
 /* True if this music file type supports multiple tracks */
 gme_bool gme_type_multitrack( gme_type_t );
 
