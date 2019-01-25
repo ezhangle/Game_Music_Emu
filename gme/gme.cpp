@@ -98,6 +98,11 @@ gme_type_t gme_identify_extension( const char extension_ [] )
 	return *types;
 }
 
+const char* gme_type_extension( gme_type_t type )
+{
+	return type->extension_;
+}
+
 gme_err_t gme_identify_file( const char path [], gme_type_t* type_out )
 {
 	*type_out = gme_identify_extension( path );
@@ -257,8 +262,8 @@ gme_err_t gme_track_info( Music_Emu const* me, gme_info_t** out, int track )
 	COPY( length );
 	COPY( intro_length );
 	COPY( loop_length );
+	COPY( fade_length );
 	
-	info->i4  = -1;
 	info->i5  = -1;
 	info->i6  = -1;
 	info->i7  = -1;

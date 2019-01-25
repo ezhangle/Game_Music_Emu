@@ -96,8 +96,11 @@ struct gme_info_t
 	/* Length if available, otherwise intro_length+loop_length*2 if available,
 	otherwise a default of 150000 (2.5 minutes). */
 	int play_length;
+
+	/* Fade duration, in milliseconds, if the file specifies it */
+	int fade_length;
 	
-	int i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15; /* reserved */
+	int i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15; /* reserved */
 	
 	/* empty string ("") if not available */
 	const char* system;
@@ -198,6 +201,9 @@ gme_type_t const* gme_type_list();
 
 /* Name of game system for this music file type */
 const char* gme_type_system( gme_type_t );
+
+/* File type extension for this music file type */
+const char* gme_type_extension( gme_type_t );
 
 /* True if this music file type supports multiple tracks */
 gme_bool gme_type_multitrack( gme_type_t );

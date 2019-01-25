@@ -70,7 +70,7 @@ static void copy_info( track_info_t* out, const Bml_Parser& in )
     if ( value )
         out->fade_length = strtoul( value, &end, 10 );
     else
-        out->fade_length = 0;
+        out->fade_length = -1;
 }
 
 blargg_err_t Sfm_Emu::track_info_( track_info_t* out, int ) const

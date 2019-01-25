@@ -528,6 +528,9 @@ blargg_err_t Vgm_Emu::load_mem_( const byte* in, int file_size )
         }
     }
 
+	memset( &metadata, 0, sizeof(metadata) );
+	memset( &metadata_j, 0, sizeof(metadata_j) );
+
     get_vgm_length( header(), &metadata );
     
     int data_offset = header().lngDataOffset;

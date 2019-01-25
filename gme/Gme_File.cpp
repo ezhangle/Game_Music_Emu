@@ -102,9 +102,9 @@ blargg_err_t Gme_File::remap_track_( int* track_io ) const
 		if ( e.track >= 0 )
 		{
 			*track_io = e.track;
-			// TODO: really needs to be removed?
-			//if ( !(type_->flags_ & 0x02) )
-			//  *track_io -= e.decimal_track;
+			// TODO: really needs to be removed? // At least NSF needs this.
+			if ( !(type_->flags_ & 0x02) )
+				*track_io -= e.decimal_track;
 		}
 		if ( *track_io >= raw_track_count_ )
 			return BLARGG_ERR( BLARGG_ERR_FILE_CORRUPT, "invalid track in m3u playlist" );

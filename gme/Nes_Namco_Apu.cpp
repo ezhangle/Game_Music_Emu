@@ -36,7 +36,6 @@ void Nes_Namco_Apu::reset()
 		Namco_Osc& osc = oscs [i];
 		osc.delay = 0;
 		osc.last_amp = 0;
-		osc.wave_pos = 0;
 	}
 }
 
@@ -59,7 +58,6 @@ void Nes_Namco_Apu::reflect_state( Tagged_Data& data )
 	for ( i = 0; i < osc_count; i++ )
 	{
 		reflect_int32( data, BLARGG_4CHAR('D','L','Y','0') + i, &oscs [i].delay );
-		reflect_int16( data, BLARGG_4CHAR('P','O','S','0') + i, &oscs [i].wave_pos );
 	}
 }
 */
@@ -89,7 +87,7 @@ void Nes_Namco_Apu::run_until( blip_time_t nes_end_time )
 		osc.delay = 0;
 		if ( time < end_time )
 		{
-			const BOOST::uint8_t* osc_reg = &reg [i * 8 + 0x40];
+			BOOST::uint8_t* osc_reg = &reg [i * 8 + 0x40];
 			if ( !(osc_reg [4] & 0xE0) )
 				continue;
 			
@@ -100,7 +98,7 @@ void Nes_Namco_Apu::run_until( blip_time_t nes_end_time )
 			int freq = (osc_reg [4] & 3) * 0x10000 + osc_reg [2] * 0x100 + osc_reg [0];
 			if ( freq < 64 * active_oscs )
 				continue; // prevent low frequencies from excessively delaying freq changes
-			
+
 			int const master_clock_divider = 12; // NES time derived via divider of master clock
 			int const n106_divider = 45; // N106 then divides master clock by this
 			int const max_freq = 0x3FFFF;
@@ -109,21 +107,20 @@ void Nes_Namco_Apu::run_until( blip_time_t nes_end_time )
 			blip_resampled_time_t period =
 					output->resampled_duration( lowest_freq_period / 8 ) / freq * 8 * active_oscs;
 			
-			int wave_size = 32 - (osc_reg [4] >> 2 & 7) * 4;
-			if ( !wave_size )
-				continue;
+			int wave_size = 256 - (osc_reg [4] & 0xFC);
 			
 			int last_amp = osc.last_amp;
-			int wave_pos = osc.wave_pos;
-			
+			int wave_pos = osc_reg [5];
+
 			output->set_modified();
 			
 			do
 			{
 				// read wave sample
-				int addr = wave_pos + osc_reg [6];
+				while (wave_pos >= wave_size)
+					wave_pos -= wave_size;
+				int addr = (wave_pos + osc_reg [6]) & 0xFF;
 				int sample = reg [addr >> 1] >> (addr << 2 & 4);
-				wave_pos++;
 				sample = (sample & 15) * volume;
 				
 				// output impulse if amplitude changed
@@ -135,13 +132,13 @@ void Nes_Namco_Apu::run_until( blip_time_t nes_end_time )
 				}
 				
 				// next sample
+				++wave_pos;
 				time += period;
-				if ( wave_pos >= wave_size )
-					wave_pos = 0;
 			}
 			while ( time < end_time );
+
+			osc_reg [5] = wave_pos;
 			
-			osc.wave_pos = wave_pos;
 			osc.last_amp = last_amp;
 		}
 		osc.delay = time - end_time;
